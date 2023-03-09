@@ -55,7 +55,8 @@ void Application::Display(void)
 	static float fPos = 0.0f;
 	m_pCamera->SetPosition(vector3(0.0f, 0.0f, 10.0f + fPos));
 	m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f));
-	fPos -= 0.01f;
+	m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f));
+	fPos -= 0.1f;
 
 	//m_pCameraMngr->SetFOV(fPos + 45.0f);
 	/* 
@@ -67,9 +68,9 @@ void Application::Display(void)
 	*/
 
 	//draw the primitive
-	//m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),	//Projection
-	//					m_pCamera->GetViewMatrix(),			//View
-	//					IDENTITY_M4);						//model
+	m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),	//Projection
+						m_pCamera->GetViewMatrix(),			//View
+						IDENTITY_M4);						//model
 
 	//render list call
 	m_uRenderCallCount = m_pModelMngr->Render();
