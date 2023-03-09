@@ -53,9 +53,11 @@ void Application::Display(void)
 
 	//Camera position
 	static float fPos = 0.0f;
-	m_pCamera->SetPosition(vector3(fPos, 0.0f, 10.0f));
-	m_pCamera->SetTarget(vector3(fPos, 0.0f, 9.0f));
+	m_pCamera->SetPosition(vector3(0.0f, 0.0f, 10.0f + fPos));
+	m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f));
 	fPos -= 0.01f;
+
+	//m_pCameraMngr->SetFOV(fPos + 45.0f);
 	/* 
 	Steve is in the dll's Camera class space, while the other primitives
 	are in the MyCamera class space so they seem to be separating altough
@@ -65,9 +67,9 @@ void Application::Display(void)
 	*/
 
 	//draw the primitive
-	m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),	//Projection
-						m_pCamera->GetViewMatrix(),			//View
-						IDENTITY_M4);						//model
+	//m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),	//Projection
+	//					m_pCamera->GetViewMatrix(),			//View
+	//					IDENTITY_M4);						//model
 
 	//render list call
 	m_uRenderCallCount = m_pModelMngr->Render();
