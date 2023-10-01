@@ -62,7 +62,7 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 
 	float halfHeight = a_fHeight / 2.0f;
 
-	// Calculate vertices for the base of the cone
+	//Calculate cone base
 	std::vector<vector3> baseVertices;
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
@@ -71,8 +71,7 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 		float z = a_fRadius * sin(angle);
 		baseVertices.push_back(vector3(x, -halfHeight, z));
 	}
-
-	// Calculate vertices for the sides of the cone
+	//Calculate cone sides
 	std::vector<vector3> sideVertices;
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
@@ -87,14 +86,13 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 		sideVertices.push_back(vector3(x, -halfHeight, z));
 	}
 
-	// Add the base vertices
+	//Add base
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
 		int nextIndex = (i + 1) % a_nSubdivisions;
 		AddTri(baseVertices[i], baseVertices[nextIndex], vector3(0.0f, -halfHeight, 0.0f));
 	}
-
-	// Add the side vertices
+	//Add sides
 	for (int i = 0; i < a_nSubdivisions * 3; i++)
 	{
 		AddVertexPosition(sideVertices[i]);
@@ -105,9 +103,13 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
 }
-
 void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
+	/*
+	Currently, this displays perfectly in orthographic view but looks really wonky and warped in perspective,
+	and I don't know why
+	*/
+
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
 
@@ -122,9 +124,40 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float halfHeight = a_fHeight / 2.0f;
+
+	//Calculate cylinder caps
+	std::vector<vector3> topVertices;
+	std::vector<vector3> bottomVertices;
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = glm::radians(static_cast<float>(i) / static_cast<float>(a_nSubdivisions) * 360.0f);
+		float x = a_fRadius * cos(angle);
+		float z = a_fRadius * sin(angle);
+		topVertices.push_back(vector3(x, halfHeight, z));
+		bottomVertices.push_back(vector3(x, -halfHeight, z));
+	}
+
+	//Add caps
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		int nextIndex = (i + 1) % a_nSubdivisions;
+		AddTri(topVertices[i], topVertices[nextIndex], vector3(0.0f, halfHeight, 0.0f));
+		AddTri(bottomVertices[i], vector3(0.0f, -halfHeight, 0.0f), bottomVertices[nextIndex]);
+	}
+
+	//Calculate side vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		int nextIndex = (i + 1) % a_nSubdivisions;
+		vector3 topVertex1 = topVertices[i];
+		vector3 topVertex2 = topVertices[nextIndex];
+		vector3 bottomVertex1 = bottomVertices[i];
+		vector3 bottomVertex2 = bottomVertices[nextIndex];
+
+		//Add sides
+		AddQuad(bottomVertex1, bottomVertex2, topVertex1, topVertex2);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
