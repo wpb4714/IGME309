@@ -60,14 +60,52 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float halfHeight = a_fHeight / 2.0f;
+
+	// Calculate vertices for the base of the cone
+	std::vector<vector3> baseVertices;
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = glm::radians(static_cast<float>(i) / static_cast<float>(a_nSubdivisions) * 360.0f);
+		float x = a_fRadius * cos(angle);
+		float z = a_fRadius * sin(angle);
+		baseVertices.push_back(vector3(x, -halfHeight, z));
+	}
+
+	// Calculate vertices for the sides of the cone
+	std::vector<vector3> sideVertices;
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = glm::radians(static_cast<float>(i) / static_cast<float>(a_nSubdivisions) * 360.0f);
+		float x = a_fRadius * cos(angle);
+		float z = a_fRadius * sin(angle);
+		sideVertices.push_back(vector3(x, -halfHeight, z));
+		sideVertices.push_back(vector3(0.0f, halfHeight, 0.0f));
+		int nextIndex = (i + 1) % a_nSubdivisions;
+		x = a_fRadius * cos(glm::radians(static_cast<float>(nextIndex) / static_cast<float>(a_nSubdivisions) * 360.0f));
+		z = a_fRadius * sin(glm::radians(static_cast<float>(nextIndex) / static_cast<float>(a_nSubdivisions) * 360.0f));
+		sideVertices.push_back(vector3(x, -halfHeight, z));
+	}
+
+	// Add the base vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		int nextIndex = (i + 1) % a_nSubdivisions;
+		AddTri(baseVertices[i], baseVertices[nextIndex], vector3(0.0f, -halfHeight, 0.0f));
+	}
+
+	// Add the side vertices
+	for (int i = 0; i < a_nSubdivisions * 3; i++)
+	{
+		AddVertexPosition(sideVertices[i]);
+		AddVertexColor(a_v3Color);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
 }
+
 void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
 	if (a_fRadius < 0.01f)
