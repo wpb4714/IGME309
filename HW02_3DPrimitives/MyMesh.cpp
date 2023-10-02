@@ -256,9 +256,47 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//Calculate torus vertices
+	std::vector<vector3> torusVertices;
+
+	for (int i = 0; i < a_nSubdivisionsA; i++)
+	{
+		float phi = glm::radians(static_cast<float>(i) / static_cast<float>(a_nSubdivisionsA) * 360.0f);
+		for (int j = 0; j < a_nSubdivisionsB; j++)
+		{
+			float theta = glm::radians(static_cast<float>(j) / static_cast<float>(a_nSubdivisionsB) * 360.0f);
+			float x = (a_fOuterRadius + a_fInnerRadius * cos(theta)) * cos(phi);
+			float y = (a_fOuterRadius + a_fInnerRadius * cos(theta)) * sin(phi);
+			float z = a_fInnerRadius * sin(theta);
+			torusVertices.push_back(vector3(x, y, z));
+		}
+	}
+
+	//Create quads
+	for (int i = 0; i < a_nSubdivisionsA; i++)
+	{
+		int nextI = (i + 1) % a_nSubdivisionsA;
+
+		for (int j = 0; j < a_nSubdivisionsB; j++)
+		{
+			int nextJ = (j + 1) % a_nSubdivisionsB;
+
+			//Calculate indices for quad vertices
+			int index1 = i * a_nSubdivisionsB + j;
+			int index2 = i * a_nSubdivisionsB + nextJ;
+			int index3 = nextI * a_nSubdivisionsB + j;
+			int index4 = nextI * a_nSubdivisionsB + nextJ;
+
+			//Add vertices
+			vector3 v1 = torusVertices[index1];
+			vector3 v2 = torusVertices[index2];
+			vector3 v3 = torusVertices[index3];
+			vector3 v4 = torusVertices[index4];
+
+			//Create quad
+			AddQuad(v1, v2, v3, v4);
+		}
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
