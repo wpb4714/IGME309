@@ -294,7 +294,7 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 			vector3 v4 = torusVertices[index4];
 
 			//Create quad
-			AddQuad(v1, v2, v3, v4);
+			AddQuad(v1, v3, v2, v4);
 		}
 	}
 
