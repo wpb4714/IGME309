@@ -269,21 +269,51 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
 
-	//Sets minimum and maximum of subdivisions
+	// Sets minimum and maximum of subdivisions
 	if (a_nSubdivisions < 1)
 	{
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 8)
+		a_nSubdivisions = 8;
 
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//Calculate sphere vertices
+	std::vector<vector3> sphereVertices;
+	for (int i = 0; i <= a_nSubdivisions; i++)
+	{
+		float phi = glm::pi<float>() * static_cast<float>(i) / static_cast<float>(a_nSubdivisions); //vertical angle
+		for (int j = 0; j <= a_nSubdivisions; j++)
+		{
+			float theta = 2.0f * glm::pi<float>() * static_cast<float>(j) / static_cast<float>(a_nSubdivisions); //horizontal angle
+			float x = a_fRadius * sin(phi) * cos(theta);
+			float y = a_fRadius * cos(phi);
+			float z = a_fRadius * sin(phi) * sin(theta);
+			sphereVertices.push_back(vector3(x, y, z));
+		}
+	}
+
+	//Create quads for the sphere
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		for (int j = 0; j < a_nSubdivisions; j++)
+		{
+			int currentIndex = i * (a_nSubdivisions + 1) + j;
+			int nextIndex = currentIndex + a_nSubdivisions + 1;
+
+			//Add vertices for the quad
+			vector3 v1 = sphereVertices[currentIndex];
+			vector3 v2 = sphereVertices[currentIndex + 1];
+			vector3 v3 = sphereVertices[nextIndex];
+			vector3 v4 = sphereVertices[nextIndex + 1];
+
+			//Add quad to mesh
+			AddQuad(v1, v2, v3, v4);
+		}
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
