@@ -165,10 +165,6 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 }
 void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
-    /*
-	Currently just the caps are done
-	*/
-	
 	if (a_fOuterRadius < 0.01f)
         a_fOuterRadius = 0.01f;
 
@@ -209,7 +205,7 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 		botInnerVertices.push_back(vector3(xInner, -halfHeight, zInner));
     }
 
-    //Create caps
+    //Add sides
     for (int i = 0; i < a_nSubdivisions; i++)
     {
         int nextIndex = (i + 1) % a_nSubdivisions;
@@ -226,8 +222,10 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 		vector3 botInnerVertex1 = botInnerVertices[i];
 		vector3 botInnerVertex2 = botInnerVertices[nextIndex];
 
-        AddQuad(innerVertex1, innerVertex2, outerVertex1, outerVertex2);
-		AddQuad(botInnerVertex2, botInnerVertex1, botOuterVertex2, botOuterVertex1);
+        AddQuad(innerVertex1, innerVertex2, outerVertex1, outerVertex2); //top cap
+		AddQuad(botInnerVertex2, botInnerVertex1, botOuterVertex2, botOuterVertex1); //bottom cap
+		AddQuad(botOuterVertex2, botOuterVertex1, outerVertex2, outerVertex1); //outer sides
+		AddQuad(botInnerVertex1, botInnerVertex2, innerVertex1, innerVertex2); //inner sides
     }
 
     // Adding information about color
