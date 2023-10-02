@@ -165,33 +165,74 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 }
 void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
+    /*
+	Currently just the caps are done
+	*/
+	
 	if (a_fOuterRadius < 0.01f)
-		a_fOuterRadius = 0.01f;
+        a_fOuterRadius = 0.01f;
 
-	if (a_fInnerRadius < 0.005f)
-		a_fInnerRadius = 0.005f;
+    if (a_fInnerRadius < 0.005f)
+        a_fInnerRadius = 0.005f;
 
-	if (a_fInnerRadius > a_fOuterRadius)
-		std::swap(a_fInnerRadius, a_fOuterRadius);
+    if (a_fInnerRadius > a_fOuterRadius)
+        std::swap(a_fInnerRadius, a_fOuterRadius);
 
-	if (a_fHeight < 0.01f)
-		a_fHeight = 0.01f;
+    if (a_fHeight < 0.01f)
+        a_fHeight = 0.01f;
 
-	if (a_nSubdivisions < 3)
-		a_nSubdivisions = 3;
-	if (a_nSubdivisions > 360)
-		a_nSubdivisions = 360;
+    if (a_nSubdivisions < 3)
+        a_nSubdivisions = 3;
+    if (a_nSubdivisions > 360)
+        a_nSubdivisions = 360;
 
-	Release();
-	Init();
+    Release();
+    Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+    float halfHeight = a_fHeight / 2.0f;
 
-	// Adding information about color
-	CompleteMesh(a_v3Color);
-	CompileOpenGL3X();
+    //Calculate outer and inner circles
+    std::vector<vector3> outerVertices;
+    std::vector<vector3> innerVertices;
+	std::vector<vector3> botOuterVertices;
+	std::vector<vector3> botInnerVertices;
+    for (int i = 0; i < a_nSubdivisions; i++)
+    {
+        float angle = glm::radians(static_cast<float>(i) / static_cast<float>(a_nSubdivisions) * 360.0f);
+        float xOuter = a_fOuterRadius * cos(angle);
+        float zOuter = a_fOuterRadius * sin(angle);
+        float xInner = a_fInnerRadius * cos(angle);
+        float zInner = a_fInnerRadius * sin(angle);
+        outerVertices.push_back(vector3(xOuter, halfHeight, zOuter));
+        innerVertices.push_back(vector3(xInner, halfHeight, zInner));
+		botOuterVertices.push_back(vector3(xOuter, -halfHeight, zOuter));
+		botInnerVertices.push_back(vector3(xInner, -halfHeight, zInner));
+    }
+
+    //Create caps
+    for (int i = 0; i < a_nSubdivisions; i++)
+    {
+        int nextIndex = (i + 1) % a_nSubdivisions;
+
+		//Top cap
+        vector3 outerVertex1 = outerVertices[i];
+        vector3 outerVertex2 = outerVertices[nextIndex];
+        vector3 innerVertex1 = innerVertices[i];
+        vector3 innerVertex2 = innerVertices[nextIndex];
+
+		//Bottom cap
+		vector3 botOuterVertex1 = botOuterVertices[i];
+		vector3 botOuterVertex2 = botOuterVertices[nextIndex];
+		vector3 botInnerVertex1 = botInnerVertices[i];
+		vector3 botInnerVertex2 = botInnerVertices[nextIndex];
+
+        AddQuad(innerVertex1, innerVertex2, outerVertex1, outerVertex2);
+		AddQuad(botInnerVertex2, botInnerVertex1, botOuterVertex2, botOuterVertex1);
+    }
+
+    // Adding information about color
+    CompleteMesh(a_v3Color);
+    CompileOpenGL3X();
 }
 void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)
 {
