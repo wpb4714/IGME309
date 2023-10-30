@@ -7,11 +7,8 @@ void MyCamera::SetPositionTargetAndUpward(vector3 a_v3Position, vector3 a_v3Targ
 	m_v3Target = a_v3Target;
 	m_v3Upward = a_v3Upward;
 
-	//Calculate new direction vectors
 	m_v3Forward = glm::normalize((m_v3Position - m_v3Target) * -1.0f);
 	m_v3Rightward = glm::normalize(glm::cross(m_v3Upward, m_v3Forward) * -1.0f);
-
-	CalculateView();
 }
 void MyCamera::MoveForward(float a_fDistance)
 {
@@ -28,32 +25,28 @@ void MyCamera::MoveSideways(float a_fDistance)
 	m_v3Position += m_v3Rightward * a_fDistance;
 	m_v3Target += m_v3Rightward * a_fDistance;
 }
+
 void MyCamera::CalculateView(void)
 {
-	glm::quat m_qCamera = quaternion();
-	float cp = glm::cos(m_v3PitchYawRoll.x / 2.0f);
-	float sp = glm::sin(m_v3PitchYawRoll.x / 2.0f);
-	float cy = glm::cos(m_v3PitchYawRoll.y / 2.0f);
-	float sy = glm::sin(m_v3PitchYawRoll.y / 2.0f);
-	float cr = glm::cos(m_v3PitchYawRoll.z / 2.0f);
-	float sr = glm::sin(m_v3PitchYawRoll.z / 2.0f);
+	// Create quaternions for pitch, yaw, and roll
+	glm::quat qPitch = glm::angleAxis(m_v3PitchYawRoll.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::quat qYaw = glm::angleAxis(m_v3PitchYawRoll.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::quat qRoll = glm::angleAxis(m_v3PitchYawRoll.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
-	m_qCamera.w = (cp * cy * cr) + (sp * sy * sr);
-	m_qCamera.x = (sp * cy * cr) - (cp * sy * sr);
-	m_qCamera.y = (cp * sy * cr) + (sp * cy * sr);
-	m_qCamera.z = (cp * cy * sr) - (sp * sy * cr);
+	// Combine the rotations using quaternion multiplication
+	glm::quat m_qCamera = qPitch * qYaw * qRoll;
 
+	// Rotate the target vector
 	m_v3Target = glm::rotate(m_qCamera, m_v3Target);
 	m_v3Target -= m_v3Position;
 
-	// Recalculate directional vectors
+	// Calculate Direction Vectors
 	m_v3Forward = glm::normalize((m_v3Position - m_v3Target) * -1.0f);
 	m_v3Rightward = glm::normalize(glm::cross(m_v3Upward, m_v3Forward) * -1.0f);
 
-	// Zero out the rotation vector after applying it
-	m_v3PitchYawRoll = vector3(0.0f);
+	m_v3PitchYawRoll = glm::vec3(0.0f);  // Reset pitch, yaw, and roll
 
-	// Calculate the view matrix using updated vectors
+	// Calculate ViewMatrix
 	m_m4View = glm::lookAt(m_v3Position, m_v3Target, m_v3Upward);
 }
 
