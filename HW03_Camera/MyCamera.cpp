@@ -33,8 +33,16 @@ void MyCamera::MoveSideways(float a_fDistance)
 
 void MyCamera::CalculateView(void)
 {
+	//Tips:: Directional vectors will be affected by the orientation in the quaternion.
+	//		 After calculating any new vector one needs to update the View Matrix.
+	//		 Camera rotation should be calculated out of the m_v3PitchYawRoll member
+	//		 it will receive information from the main code on how much these orientations
+	//		 have changed so you only need to focus on the directional and positional 
+	//		 vectors. There is no need to calculate any right click process or connections.
+
 	quaternion m_qCamera = quaternion();
 
+	// Use rotation vector to make a quaternion to rotate the target
 	//Sin and Cos helper variables
 	float cosX = glm::cos(m_v3PitchYawRoll.x / 2.0f);
 	float sinX = glm::sin(m_v3PitchYawRoll.x / 2.0f);
@@ -43,6 +51,8 @@ void MyCamera::CalculateView(void)
 	float cosZ = glm::cos(m_v3PitchYawRoll.z / 2.0f);
 	float sinZ = glm::sin(m_v3PitchYawRoll.z / 2.0f);
 
+	// First we convert the m_v3PitchYawRoll rotation vector to be an orientation in quaternion
+	// (avoiding gimbal lock through using Euler angles in quaternions)
 	//Quaternion Stuff
 	m_qCamera.w = (cosX * cosY * cosZ) + (sinX * sinY * sinZ);
 	m_qCamera.x = (sinX * cosY * cosZ) - (cosX * sinY * sinZ);
