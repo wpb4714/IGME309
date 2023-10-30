@@ -16,16 +16,19 @@ void MyCamera::MoveForward(float a_fDistance)
 {
 	m_v3Position += m_v3Forward * a_fDistance;
 	m_v3Target += m_v3Forward * a_fDistance;
+	CalculateView();
 }
 void MyCamera::MoveVertical(float a_fDistance)
 {
 	m_v3Position += m_v3Upward * a_fDistance;
 	m_v3Target += m_v3Upward * a_fDistance;
+	CalculateView();
 }
 void MyCamera::MoveSideways(float a_fDistance)
 {
 	m_v3Position += m_v3Rightward * a_fDistance;
 	m_v3Target += m_v3Rightward * a_fDistance;
+	CalculateView();
 }
 
 void MyCamera::CalculateView(void)
