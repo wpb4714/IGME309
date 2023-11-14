@@ -1,6 +1,11 @@
 #include "MyRigidBody.h"
 using namespace BTX;
 //Allocation
+
+/*
+* This is a basic implementation of SAT collision detection
+* Though it functions mostly correctly, it isn't quite right
+*/
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
 	// Check for overlap along each axis
@@ -16,6 +21,62 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 		return 0; //No collision
 	}
 }
+
+/*
+This was my attempt at full implementation of SAT
+As you will be able to see if you comment-out the first implementation and uncomment this one,
+It doesn't work! And I don't know why D:
+*/
+
+//uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
+//{
+//	//Axes of the first OBB (this object) in world space
+//	vector3 axes1[3] = {
+//		glm::normalize(vector3(m_m4ToWorld * vector4(1.0f, 0.0f, 0.0f, 0.0f))),
+//		glm::normalize(vector3(m_m4ToWorld * vector4(0.0f, 1.0f, 0.0f, 0.0f))),
+//		glm::normalize(vector3(m_m4ToWorld * vector4(0.0f, 0.0f, 1.0f, 0.0f)))
+//	};
+//
+//	//Axes of the second OBB (a_pOther object) in world space
+//	vector3 axes2[3] = {
+//		glm::normalize(vector3(a_pOther->m_m4ToWorld * vector4(1.0f, 0.0f, 0.0f, 0.0f))),
+//		glm::normalize(vector3(a_pOther->m_m4ToWorld * vector4(0.0f, 1.0f, 0.0f, 0.0f))),
+//		glm::normalize(vector3(a_pOther->m_m4ToWorld * vector4(0.0f, 0.0f, 1.0f, 0.0f)))
+//	};
+//
+//	//The 15 axes to be checked (3 from the first OBB, 3 from the second OBB, and 9 cross products)
+//	vector3 axes[15] = {
+//		axes1[0], axes1[1], axes1[2],
+//		axes2[0], axes2[1], axes2[2],
+//		glm::cross(axes1[0], axes2[0]),
+//		glm::cross(axes1[0], axes2[1]),
+//		glm::cross(axes1[0], axes2[2]),
+//		glm::cross(axes1[1], axes2[0]),
+//		glm::cross(axes1[1], axes2[1]),
+//		glm::cross(axes1[1], axes2[2]),
+//		glm::cross(axes1[2], axes2[0]),
+//		glm::cross(axes1[2], axes2[1]),
+//		glm::cross(axes1[2], axes2[2])
+//	};
+//
+//	//Check for overlap along each axis
+//	for (int i = 0; i < 15; ++i) {
+//		float proj1 = glm::dot(m_v3Center, axes[i]);
+//		float proj2 = glm::dot(a_pOther->m_v3Center, axes[i]);
+//		float distance = glm::abs(proj1 - proj2);
+//
+//		//Calculate the projected half-widths of each OBB on the axis
+//		float halfWidth1 = glm::dot(m_v3HalfWidth, glm::abs(axes[i]));
+//		float halfWidth2 = glm::dot(a_pOther->m_v3HalfWidth, glm::abs(axes[i]));
+//
+//		//Check for overlap
+//		if (distance > (halfWidth1 + halfWidth2)) {
+//			return 0; // No collision
+//		}
+//	}
+//
+//	return 1; //Return a non-zero value to indicate collision
+//}
 
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 {
