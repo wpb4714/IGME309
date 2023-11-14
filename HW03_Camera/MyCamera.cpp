@@ -28,25 +28,25 @@ void MyCamera::MoveSideways(float a_fDistance)
 
 void MyCamera::CalculateView(void)
 {
-	// Create quaternions for pitch, yaw, and roll
+	//Create quaternions for pitch, yaw, and roll
 	glm::quat qPitch = glm::angleAxis(m_v3PitchYawRoll.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::quat qYaw = glm::angleAxis(m_v3PitchYawRoll.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::quat qRoll = glm::angleAxis(m_v3PitchYawRoll.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
-	// Combine the rotations using quaternion multiplication
+	//Combine the rotations using quaternion multiplication
 	glm::quat m_qCamera = qPitch * qYaw * qRoll;
 
-	// Rotate the target vector
+	//Rotate the target vector
 	m_v3Target = glm::rotate(m_qCamera, m_v3Target);
 	m_v3Target -= m_v3Position;
 
-	// Calculate Direction Vectors
+	//Calculate Direction Vectors
 	m_v3Forward = glm::normalize((m_v3Position - m_v3Target) * -1.0f);
 	m_v3Rightward = glm::normalize(glm::cross(m_v3Upward, m_v3Forward) * -1.0f);
 
 	m_v3PitchYawRoll = glm::vec3(0.0f);  // Reset pitch, yaw, and roll
 
-	// Calculate ViewMatrix
+	//Calculate ViewMatrix
 	m_m4View = glm::lookAt(m_v3Position, m_v3Target, m_v3Upward);
 }
 

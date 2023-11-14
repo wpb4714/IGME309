@@ -3,11 +3,35 @@ using namespace BTX;
 //Allocation
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	//TODO: Calculate the SAT algorithm I STRONGLY suggest you use the
-	//Real Time Collision detection algorithm for OBB here but feel free to
-	//implement your own solution.
-	return BTXs::eSATResults::SAT_NONE;
+	//get the axes to test
+	vector3 axes[3] = {
+		AXIS_X, 
+		AXIS_Y,
+		AXIS_Z,
+	};
+
+	//Loop through axes
+	for (int i = 0; i < 3; i++) {
+		//Get max and mins for each object, converted to world space
+		vector3 minA = vector3(m_m4ToWorld * GetMinLocal().x, m_m4ToWorld * GetMinLocal().y, m_m4ToWorld * GetMinLocal().z);
+		vector3 maxA = vector3(m_m4ToWorld * GetMaxLocal().x, m_m4ToWorld * GetMaxLocal().y, m_m4ToWorld * GetMaxLocal().z);
+		vector3 minB = vector3(m_m4ToWorld * a_pOther->GetMinLocal().x, m_m4ToWorld * a_pOther->GetMinLocal().y, m_m4ToWorld * a_pOther->GetMinLocal().z);
+		vector3 maxB = vector3(m_m4ToWorld * a_pOther->GetMaxLocal().x, m_m4ToWorld * a_pOther->GetMaxLocal().y, m_m4ToWorld * a_pOther->GetMaxLocal().z);
+
+		//Project object A onto axis
+		//Project object B onto axis
+	}
+
+	//loop over the axes
+		//project both shapes onto the axis
+		//do the projections overlap?
+			//if not, we can guarantee the shapes do not overlap, and can return 0
+
+	//if we exit this loop without returning, we know that the shapes overlapped on all tested axes
+	//therefore, they are colliding, and we can return 1
 }
+
+
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 {
 	//check if spheres are colliding
