@@ -3,34 +3,19 @@ using namespace BTX;
 //Allocation
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	//get the axes to test
-	vector3 axes[3] = {
-		AXIS_X, 
-		AXIS_Y,
-		AXIS_Z,
-	};
+	// Check for overlap along each axis
+	bool overlapX = (std::max(m_v3MinG.x, a_pOther->m_v3MinG.x) <= std::min(m_v3MaxG.x, a_pOther->m_v3MaxG.x));
+	bool overlapY = (std::max(m_v3MinG.y, a_pOther->m_v3MinG.y) <= std::min(m_v3MaxG.y, a_pOther->m_v3MaxG.y));
+	bool overlapZ = (std::max(m_v3MinG.z, a_pOther->m_v3MinG.z) <= std::min(m_v3MaxG.z, a_pOther->m_v3MaxG.z));
 
-	//Loop through axes
-	for (int i = 0; i < 3; i++) {
-		//Get max and mins for each object, converted to world space
-		vector3 minA = vector3(m_m4ToWorld * GetMinLocal().x, m_m4ToWorld * GetMinLocal().y, m_m4ToWorld * GetMinLocal().z);
-		vector3 maxA = vector3(m_m4ToWorld * GetMaxLocal().x, m_m4ToWorld * GetMaxLocal().y, m_m4ToWorld * GetMaxLocal().z);
-		vector3 minB = vector3(m_m4ToWorld * a_pOther->GetMinLocal().x, m_m4ToWorld * a_pOther->GetMinLocal().y, m_m4ToWorld * a_pOther->GetMinLocal().z);
-		vector3 maxB = vector3(m_m4ToWorld * a_pOther->GetMaxLocal().x, m_m4ToWorld * a_pOther->GetMaxLocal().y, m_m4ToWorld * a_pOther->GetMaxLocal().z);
-
-		//Project object A onto axis
-		//Project object B onto axis
+	//If there is overlap along all axes, the objects are colliding
+	if (overlapX && overlapY && overlapZ) {
+		return 1; //Return a non-zero value to indicate collision
 	}
-
-	//loop over the axes
-		//project both shapes onto the axis
-		//do the projections overlap?
-			//if not, we can guarantee the shapes do not overlap, and can return 0
-
-	//if we exit this loop without returning, we know that the shapes overlapped on all tested axes
-	//therefore, they are colliding, and we can return 1
+	else {
+		return 0; //No collision
+	}
 }
-
 
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 {
@@ -45,7 +30,7 @@ bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 	{
 		uint nResult = SAT(a_pOther);
 
-		if (bColliding) //The SAT shown they are colliding
+		if (nResult != 0) //The SAT shown they are colliding
 		{
 			this->AddCollisionWith(a_pOther);
 			a_pOther->AddCollisionWith(this);
