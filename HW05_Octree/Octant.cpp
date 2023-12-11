@@ -24,17 +24,20 @@ Octant::Octant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 
 	std::vector<vector3> lMinMax;
 
+	//Loop through entities
 	for (int i = 0; i < m_pEntityMngr->GetEntityCount(); i++)
 	{
 		Entity* entity = m_pEntityMngr->GetEntity(i);
 
+		//Get rigidbody for entity
 		RigidBody* rigidBody = entity->GetRigidBody();
 
+		//Get min and max of rigidbody
 		lMinMax.push_back(rigidBody->GetMinGlobal());
 		lMinMax.push_back(rigidBody->GetMaxGlobal());
 	}
 
-	//create rigid body enclosing all objects
+	//create new rigidbody enclosing all objects
 	RigidBody* pRigidBody = new RigidBody(lMinMax);
 
 	//calculate half-width and max
@@ -81,6 +84,7 @@ bool Octant::IsColliding(uint a_uRBIndex)
 	vector3 min = rigidBody->GetMinGlobal();
 	vector3 max = rigidBody->GetMaxGlobal();
 
+	//Check if colliding AABB
 	return !(m_v3Max.x < min.x || m_v3Min.x > max.x ||
 		m_v3Max.y < min.y || m_v3Min.y > max.y ||
 		m_v3Max.z < min.z || m_v3Min.z > max.z);
@@ -150,8 +154,10 @@ void Octant::Subdivide(void)
 bool Octant::ContainsAtLeast(uint a_nEntities)
 {
 	int count = 0;
+
 	const int entityCount = m_pEntityMngr->GetEntityCount();
 
+	//loop through entities and count collisions
 	for (int i = 0; i < entityCount && count <= a_nEntities; i++)
 	{
 		if (IsColliding(i))
